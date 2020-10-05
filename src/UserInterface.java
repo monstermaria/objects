@@ -35,11 +35,12 @@ public class UserInterface implements Runnable {
 
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
+        // The TableData object is used for all showcases
         TableData td = new TableData("sample.csv");
 
-        // sort on arbitrary column
-        // td.sortOnColumn(td.getRows(), 4);
-
+        /*
+         * simple solution uses the sort function built into JTable
+         */
         JLabel headerSimpleSolution = new JLabel("Simple Solution");
         container.add(headerSimpleSolution);
 
@@ -47,13 +48,17 @@ public class UserInterface implements Runnable {
         table.setAutoCreateRowSorter(true);
         container.add(new JScrollPane(table));
 
-        JLabel headerObjectSolution = new JLabel("Object Solution");
-        container.add(headerObjectSolution);
+        /*
+         * array list solution shows how to add a row and save the data NOTE: the new
+         * row might not show up unless you scroll the table
+         */
+        JLabel headerArrayListSolution = new JLabel("ArrayList Solution");
+        container.add(headerArrayListSolution);
 
         SampleTableModel tm = new SampleTableModel(td);
 
-        JTable tableWithObjects = new JTable(tm);
-        JScrollPane scrollPane = new JScrollPane(tableWithObjects);
+        JTable tableWithArrayList = new JTable(tm);
+        JScrollPane scrollPane = new JScrollPane(tableWithArrayList);
         container.add(scrollPane);
 
         JButton addRow = new JButton("Add a new row");
@@ -69,7 +74,6 @@ public class UserInterface implements Runnable {
         saveCsv.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
-                // System.out.println("Save!");
                 td.saveCsvFile();
             }
         });

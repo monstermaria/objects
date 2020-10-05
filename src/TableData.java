@@ -105,16 +105,16 @@ public class TableData {
     }
 
     void addRow() {
-        System.out.println("Add row!");
         ArrayList<String> newRow = new ArrayList<String>();
+        // add empty strings for each of the items on the row
         for (int i = 0; i < this.headers.size(); i++) {
             newRow.add("");
         }
+        // add the newly created row
         this.rows.add(newRow);
     }
 
     void saveCsvFile() {
-        System.out.println("Save CSV!");
         StringBuilder output = new StringBuilder();
         for (String header : this.headers) {
             output.append(header);
@@ -122,7 +122,6 @@ public class TableData {
         }
         output.deleteCharAt(output.length() - 1);
         output.append("\n");
-        // output.append(this.headers);
         for (ArrayList<String> row : this.rows) {
             for (String value : row) {
                 output.append(value);
@@ -131,8 +130,8 @@ public class TableData {
             output.deleteCharAt(output.length() - 1);
             output.append("\n");
         }
-        // output.append(this.rows);
-        // System.out.println(output);
+        output.deleteCharAt(output.length() - 1);
+
         try {
             File saveFile = new File("modified_sample.csv");
             FileWriter writer = new FileWriter(saveFile);
@@ -141,23 +140,5 @@ public class TableData {
         } catch (Exception e) {
             System.out.println("Save failed");
         }
-
-    }
-
-    String[][] sortOnColumn(String[][] stringMatrix, int columnIndex) {
-
-        // class MyComparator implements Comparator<String[]> {
-        // int column = 0;
-
-        // MyComparator(int column) {
-        // this.column = column;
-        // }
-
-        // // @Override
-        // // int compare(Object a, Object b) {
-        // // return 0;
-        // // }
-        // }
-        return stringMatrix;
     }
 }
