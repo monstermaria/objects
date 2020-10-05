@@ -31,8 +31,6 @@ public class UserInterface implements Runnable {
     }
 
     private void createComponents(Container container) {
-        System.out.println("Creating components");
-
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 
         // The TableData object is used for all showcases
@@ -44,21 +42,21 @@ public class UserInterface implements Runnable {
         JLabel headerSimpleSolution = new JLabel("Simple Solution");
         container.add(headerSimpleSolution);
 
-        JTable table = new JTable(td.getRows(), td.getHeaders());
+        JTable table = new JTable(td.rowArrays, td.headerArray);
         table.setAutoCreateRowSorter(true);
         container.add(new JScrollPane(table));
 
         /*
-         * array list solution shows how to add a row and save the data NOTE: the new
-         * row might not show up unless you scroll the table
+         * object solution shows how to add a row and save the data NOTE: the new row
+         * might not show up unless you scroll the table
          */
-        JLabel headerArrayListSolution = new JLabel("ArrayList Solution");
-        container.add(headerArrayListSolution);
+        JLabel headerObjectSolution = new JLabel("Object Solution");
+        container.add(headerObjectSolution);
 
         SampleTableModel tm = new SampleTableModel(td);
 
-        JTable tableWithArrayList = new JTable(tm);
-        JScrollPane scrollPane = new JScrollPane(tableWithArrayList);
+        JTable tableWithObjects = new JTable(tm);
+        JScrollPane scrollPane = new JScrollPane(tableWithObjects);
         container.add(scrollPane);
 
         JButton addRow = new JButton("Add a new row");
@@ -77,7 +75,7 @@ public class UserInterface implements Runnable {
                 td.saveCsvFile();
             }
         });
-        container.add(saveCsv);
 
+        container.add(saveCsv);
     }
 }

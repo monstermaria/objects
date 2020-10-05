@@ -8,8 +8,13 @@ public class TableData {
     ArrayList<String> headers = new ArrayList<String>();
     ArrayList<ArrayList<String>> rows = new ArrayList<ArrayList<String>>();
 
+    ArrayList<SampleRowObject> rowObjects = new ArrayList<SampleRowObject>();
+    String[][] rowArrays;
+    String[] headerArray;
+
     public TableData(String fileName) {
         File csvFile = new File(fileName);
+
         try {
             Scanner scanner = new Scanner(csvFile);
             readData(scanner);
@@ -17,6 +22,10 @@ public class TableData {
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
+
+        this.rowArrays = this.getRows();
+        this.rowObjects = this.getSampleRowObjects();
+        this.headerArray = this.getHeaders();
     }
 
     private void readData(Scanner scanner) {
@@ -61,7 +70,7 @@ public class TableData {
         return values;
     }
 
-    String[] getHeaders() {
+    private String[] getHeaders() {
         int nbrOfColumns = this.headers.size();
         String[] headers = new String[nbrOfColumns];
 
@@ -72,7 +81,7 @@ public class TableData {
         return headers;
     }
 
-    String[][] getRows() {
+    private String[][] getRows() {
         int nbrOfColumns = this.headers.size();
         int nbrOfRows = this.rows.size();
 
@@ -84,7 +93,7 @@ public class TableData {
                 try {
                     data[i][j] = this.rows.get(i).get(j);
                 } catch (Exception e) {
-                    System.out.println("Indexing failed at row " + i + " column " + j);
+                    System.out.print("Indexing failed at row " + i + " column " + j + ": ");
                     System.out.println(e.getMessage());
                     data[i][j] = ""; // add this here or when parsing the csv file?
                 }
@@ -94,10 +103,10 @@ public class TableData {
         return data;
     }
 
-    ArrayList<SampleRowObject> getSampleRowObjects() {
+    private ArrayList<SampleRowObject> getSampleRowObjects() {
         ArrayList<SampleRowObject> objects = new ArrayList<>();
 
-        for (String[] row : this.getRows()) {
+        for (String[] row : this.rowArrays) {
             objects.add(new SampleRowObject(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]));
         }
 
@@ -105,13 +114,8 @@ public class TableData {
     }
 
     void addRow() {
-        ArrayList<String> newRow = new ArrayList<String>();
-        // add empty strings for each of the items on the row
-        for (int i = 0; i < this.headers.size(); i++) {
-            newRow.add("");
-        }
-        // add the newly created row
-        this.rows.add(newRow);
+        SampleRowObject newRowObject = new SampleRowObject("", "", "", "", "", "", "", "");
+        this.rowObjects.add(newRowObject);
     }
 
     void saveCsvFile() {
@@ -122,13 +126,16 @@ public class TableData {
         }
         output.deleteCharAt(output.length() - 1);
         output.append("\n");
-        for (ArrayList<String> row : this.rows) {
-            for (String value : row) {
-                output.append(value);
-                output.append(",");
-            }
-            output.deleteCharAt(output.length() - 1);
-            output.append("\n");
+
+        for (SampleRowObject row : this.rowObjects) {
+            output.append(row.orderDate + ",");
+            output.append(row.region + ",");
+            output.append(row.rep1 + ",");
+            output.append(row.rep2 + ",");
+            output.append(row.item + ",");
+            output.append(row.units + ",");
+            output.append(row.unitCost + ",");
+            output.append(row.total + "\n");
         }
         output.deleteCharAt(output.length() - 1);
 

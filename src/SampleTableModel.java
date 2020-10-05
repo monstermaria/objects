@@ -1,3 +1,5 @@
+import java.lang.reflect.Field;
+
 import javax.swing.table.AbstractTableModel;
 
 class SampleTableModel extends AbstractTableModel {
@@ -17,14 +19,19 @@ class SampleTableModel extends AbstractTableModel {
     }
 
     public int getRowCount() {
-        return td.rows.size();
+        return td.rowObjects.size();
     }
 
     public Object getValueAt(int row, int column) {
+        SampleRowObject rowObject = this.td.rowObjects.get(row);
+        String columnName = this.getColumnName(column);
+        columnName = columnName.substring(0, 1).toLowerCase() + columnName.substring(1);
         try {
-            return this.td.rows.get(row).get(column);
+            Field columnField = SampleRowObject.class.getDeclaredField(columnName);
+            return columnField.get(rowObject);
         } catch (Exception e) {
-            return "";
+            System.out.println(e);
+            return "Failed";
         }
     }
 
@@ -40,11 +47,14 @@ class SampleTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        SampleRowObject rowObject = this.td.rowObjects.get(rowIndex);
+        String columnName = this.getColumnName(columnIndex);
+        columnName = columnName.substring(0, 1).toLowerCase() + columnName.substring(1);
         try {
-            td.rows.get(rowIndex).remove(columnIndex);
-            td.rows.get(rowIndex).add(columnIndex, (String) aValue);
+            Field columnField = SampleRowObject.class.getDeclaredField(columnName);
+            columnField.set(rowObject, aValue);
         } catch (Exception e) {
-            System.out.println(e.getCause());
+            System.out.println(e);
         }
     }
 }
