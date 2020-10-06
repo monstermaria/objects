@@ -1,4 +1,6 @@
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -56,6 +58,13 @@ public class UserInterface implements Runnable {
         SampleTableModel tm = new SampleTableModel(td);
 
         JTable tableWithObjects = new JTable(tm);
+        tableWithObjects.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = table.columnAtPoint(e.getPoint());
+                td.sortObjects(col);
+            }
+        });
         JScrollPane scrollPane = new JScrollPane(tableWithObjects);
         container.add(scrollPane);
 

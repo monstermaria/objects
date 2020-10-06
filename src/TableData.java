@@ -1,7 +1,10 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class TableData {
@@ -147,5 +150,24 @@ public class TableData {
         } catch (Exception e) {
             System.out.println("Save failed");
         }
+    }
+
+    void sortObjects(int column) {
+        String columnName = this.headers.get(column);
+        String fieldName = columnName.substring(0, 1).toLowerCase() + columnName.substring(1);
+        System.out.println("Sort on column " + column + ", " + columnName);
+        Collections.sort(this.rowObjects, new Comparator<SampleRowObject>() {
+            public int compare(SampleRowObject o1, SampleRowObject o2) {
+                try {
+                    Field columnField = SampleRowObject.class.getDeclaredField(fieldName);
+                    String valueToCompareO1 = (String) columnField.get(o1);
+                    String valueToCompareO2 = (String) columnField.get(o2);
+                    return valueToCompareO1.compareToIgnoreCase(valueToCompareO2);
+                } catch (Exception e) {
+                    System.out.println(e);
+                    return 0;
+                }
+            }
+        });
     }
 }
