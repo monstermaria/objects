@@ -55,9 +55,13 @@ public class UserInterface implements Runnable {
         JLabel headerObjectSolution = new JLabel("Object Solution");
         container.add(headerObjectSolution);
 
+        // create a custom table model
         SampleTableModel tm = new SampleTableModel(td);
 
+        // create a JTable with the custom tabel model
         JTable tableWithObjects = new JTable(tm);
+
+        // add listener to sort the table on the clicked column header
         tableWithObjects.getTableHeader().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -65,9 +69,12 @@ public class UserInterface implements Runnable {
                 td.sortObjects(col);
             }
         });
+
+        // put the table in a scroll pane and add that to the container
         JScrollPane scrollPane = new JScrollPane(tableWithObjects);
         container.add(scrollPane);
 
+        // button for adding a row to the table
         JButton addRow = new JButton("Add a new row");
         addRow.addActionListener(new ActionListener() {
             @Override
@@ -77,6 +84,7 @@ public class UserInterface implements Runnable {
         });
         container.add(addRow);
 
+        // button to save the current state of the table
         JButton saveCsv = new JButton("Save changes");
         saveCsv.addActionListener(new ActionListener() {
             @Override
@@ -84,7 +92,6 @@ public class UserInterface implements Runnable {
                 td.saveCsvFile();
             }
         });
-
         container.add(saveCsv);
     }
 }
