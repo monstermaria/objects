@@ -117,19 +117,23 @@ public class TableData {
     }
 
     void addRow() {
+        // add a new object to the array list that the custom table model uses
         SampleRowObject newRowObject = new SampleRowObject("", "", "", "", "", "", "", "");
         this.rowObjects.add(newRowObject);
     }
 
     void saveCsvFile() {
+        // gather the headers
         StringBuilder output = new StringBuilder();
         for (String header : this.headers) {
             output.append(header);
             output.append(",");
         }
+        // remove the last comma on the header row, and add a line break
         output.deleteCharAt(output.length() - 1);
         output.append("\n");
 
+        // add a row for every object (row) in the table model
         for (SampleRowObject row : this.rowObjects) {
             output.append(row.orderDate + ",");
             output.append(row.region + ",");
@@ -140,6 +144,7 @@ public class TableData {
             output.append(row.unitCost + ",");
             output.append(row.total + "\n");
         }
+        // remove the last line break
         output.deleteCharAt(output.length() - 1);
 
         try {
@@ -152,19 +157,37 @@ public class TableData {
         }
     }
 
-    void sortObjects(int column) {
+    String getObjectFieldName(int column) {
+        // get the name of the column
         String columnName = this.headers.get(column);
-        String fieldName = columnName.substring(0, 1).toLowerCase() + columnName.substring(1);
-        System.out.println("Sort on column " + column + ", " + columnName);
+        // replace the uppercase letter at the beginning with the corresponding
+        // lowercase letter, to get the corresponding field name in the row object
+        return columnName.substring(0, 1).toLowerCase() + columnName.substring(1);
+    }
+
+    void sortObjects(int column) {
+        String fieldName = this.getObjectFieldName(column);
+
+        // i'm using the sort method of the class Collections to implement sorting of
+        // the table model objects. i use a custom Comparator to be able to sort the
+        // objects on the content of a specific field. to make this work for any
+        // field/column, i use java reflection
         Collections.sort(this.rowObjects, new Comparator<SampleRowObject>() {
             public int compare(SampleRowObject o1, SampleRowObject o2) {
                 try {
+                    // get a field object that corresponds to the column we want to sort on
                     Field columnField = SampleRowObject.class.getDeclaredField(fieldName);
+                    // use the field object to get the values of that field from the two objects to
+                    // compare
                     String valueToCompareO1 = (String) columnField.get(o1);
                     String valueToCompareO2 = (String) columnField.get(o2);
+                    // use the built in method for comparison on string objects to make a comparison
                     return valueToCompareO1.compareToIgnoreCase(valueToCompareO2);
                 } catch (Exception e) {
                     System.out.println(e);
+                    // if a comparison can't be made, return 0
+                    // (this means that the two objects are considered equal)
+                    // NOTE: maybe it is better to let the program crash if this happens
                     return 0;
                 }
             }

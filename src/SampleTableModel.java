@@ -24,10 +24,10 @@ class SampleTableModel extends AbstractTableModel {
 
     public Object getValueAt(int row, int column) {
         SampleRowObject rowObject = this.td.rowObjects.get(row);
-        String columnName = this.getColumnName(column);
-        columnName = columnName.substring(0, 1).toLowerCase() + columnName.substring(1);
+        String fieldName = this.td.getObjectFieldName(column);
         try {
-            Field columnField = SampleRowObject.class.getDeclaredField(columnName);
+            // using java reflection to get the value of a field of the object
+            Field columnField = SampleRowObject.class.getDeclaredField(fieldName);
             return columnField.get(rowObject);
         } catch (Exception e) {
             System.out.println(e);
@@ -48,10 +48,10 @@ class SampleTableModel extends AbstractTableModel {
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         SampleRowObject rowObject = this.td.rowObjects.get(rowIndex);
-        String columnName = this.getColumnName(columnIndex);
-        columnName = columnName.substring(0, 1).toLowerCase() + columnName.substring(1);
+        String fieldName = this.td.getObjectFieldName(columnIndex);
         try {
-            Field columnField = SampleRowObject.class.getDeclaredField(columnName);
+            // using java reflection to set the value of a field of the object
+            Field columnField = SampleRowObject.class.getDeclaredField(fieldName);
             columnField.set(rowObject, aValue);
         } catch (Exception e) {
             System.out.println(e);
