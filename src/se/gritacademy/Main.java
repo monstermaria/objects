@@ -1,4 +1,6 @@
-import javax.swing.SwingUtilities;
+package se.gritacademy;
+
+import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {

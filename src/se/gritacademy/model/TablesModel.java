@@ -1,8 +1,10 @@
-import java.lang.reflect.Field;
+package se.gritacademy.model;
+
+import se.gritacademy.controller.TableData;
 
 import javax.swing.table.AbstractTableModel;
 
-class SampleTableModel extends AbstractTableModel {
+public class TablesModel extends AbstractTableModel {
     /**
      *
      */
@@ -10,7 +12,7 @@ class SampleTableModel extends AbstractTableModel {
 
     TableData td;
 
-    SampleTableModel(TableData td) {
+    public TablesModel(TableData td) {
         this.td = td;
     }
 
@@ -23,14 +25,14 @@ class SampleTableModel extends AbstractTableModel {
     }
 
     public Object getValueAt(int row, int column) {
-        SampleRowObject rowObject = this.td.rowObjects.get(row);
+        RowModel rowObject = this.td.rowObjects.get(row);
         String fieldName = this.td.getObjectFieldName(column);
         try {
             // using java reflection to get the value of a field of the object
-            Field columnField = SampleRowObject.class.getDeclaredField(fieldName);
-            return columnField.get(rowObject);
+            return RowModel.class.getDeclaredField(fieldName).get(rowObject);
+           // return columnField.get(rowObject);
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
             return "Failed";
         }
     }
@@ -47,14 +49,14 @@ class SampleTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        SampleRowObject rowObject = this.td.rowObjects.get(rowIndex);
+        RowModel rowObject = this.td.rowObjects.get(rowIndex);
         String fieldName = this.td.getObjectFieldName(columnIndex);
         try {
             // using java reflection to set the value of a field of the object
-            Field columnField = SampleRowObject.class.getDeclaredField(fieldName);
-            columnField.set(rowObject, aValue);
+            RowModel.class.getDeclaredField(fieldName).set(rowObject, aValue);
+           // columnField.set(rowObject, aValue);
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 }

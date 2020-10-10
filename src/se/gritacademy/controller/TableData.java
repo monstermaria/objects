@@ -1,19 +1,22 @@
+package se.gritacademy.controller;
+
+import se.gritacademy.model.RowModel;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class TableData {
-    ArrayList<String> headers = new ArrayList<String>();
-    ArrayList<ArrayList<String>> rows = new ArrayList<ArrayList<String>>();
+    public ArrayList<String> headers = new ArrayList<>();
+    public ArrayList<ArrayList<String>> rows = new ArrayList<>();
 
-    ArrayList<SampleRowObject> rowObjects = new ArrayList<SampleRowObject>();
-    String[][] rowArrays;
-    String[] headerArray;
+    public ArrayList<RowModel> rowObjects;
+    public String[][] rowArrays;
+    public String[] headerArray;
 
     public TableData(String fileName) {
         File csvFile = new File(fileName);
@@ -34,42 +37,51 @@ public class TableData {
     private void readData(Scanner scanner) {
         // read headers
         if (scanner.hasNext()) {
-            headers = readRow(scanner.nextLine());
+            this.headers = readRow(scanner.nextLine());
         }
 
         // read rows
         while (scanner.hasNext()) {
-            rows.add(readRow(scanner.nextLine()));
+            this.rows.add(readRow(scanner.nextLine()));
         }
     }
 
     private ArrayList<String> readRow(String row) {
-        ArrayList<String> values = new ArrayList<String>();
+        ArrayList<String> values = new ArrayList<>();
         Scanner rowScanner = new Scanner(row);
 
         rowScanner.useDelimiter(",");
         while (rowScanner.hasNext()) {
-            String value = rowScanner.next();
+            StringBuilder value = new StringBuilder(rowScanner.next());
             // handle values with comma encased in citation marks
             // if no closing citation mark is found, the rest of the row will be added to
             // one value
-            if (value.startsWith("\"")) {
-                value = value.substring(1);
+
+            if (value.toString().startsWith("\"")) {
+                value = new StringBuilder(value.substring(1));
                 while (rowScanner.hasNext()) {
                     String valuePart2 = rowScanner.next();
-                    value += valuePart2;
-                    if (value.endsWith("\"")) {
-                        value = value.substring(0, value.length() - 2);
+                    value.append(valuePart2);
+                    if (value.toString().endsWith("\"")) {
+                        value = new StringBuilder(value.substring(0, value.length() - 2));
                         break;
                     }
                 }
             }
-            values.add(value);
+
+            values.add(value.toString());
+
         }
-        rowScanner.close();
-
-        // handle missing data?
-
+        // Bad attempt at handling missing fields. It works, but pretty sure it's bad code
+        for (int i = 0; i < this.headers.size(); i++) {
+            if (values.size() != this.headers.size()) {
+                values.add(headers.size() -1, "[No Value]"); // element is up for debate.Just a Placeholder
+            }
+            if (values.get(i).isEmpty()) {
+                values.set(i, "[No Value]"); // element is up for debate.Just a Placeholder
+            }
+        }
+        System.out.println(values);
         return values;
     }
 
@@ -98,7 +110,7 @@ public class TableData {
                 } catch (Exception e) {
                     System.out.print("Indexing failed at row " + i + " column " + j + ": ");
                     System.out.println(e.getMessage());
-                    data[i][j] = ""; // add this here or when parsing the csv file?
+                   // data[i][j] = ""; // add this here or when parsing the csv file?
                 }
             }
         }
@@ -106,43 +118,42 @@ public class TableData {
         return data;
     }
 
-    private ArrayList<SampleRowObject> getSampleRowObjects() {
-        ArrayList<SampleRowObject> objects = new ArrayList<>();
-
-        for (String[] row : this.rowArrays) {
+    private ArrayList<RowModel> getSampleRowObjects() {
+        ArrayList<RowModel> objects = new ArrayList<>();
+        Arrays.stream(this.rowArrays)
+                .iterator()
+                .forEachRemaining(row -> objects.add(new RowModel(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])));
+        /*for (String[] row : this.rowArrays) {
             objects.add(new SampleRowObject(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]));
-        }
+        }*/
 
         return objects;
     }
 
-    void addRow() {
+    public void addRow() {
         // add a new object to the array list that the custom table model uses
-        SampleRowObject newRowObject = new SampleRowObject("", "", "", "", "", "", "", "");
-        this.rowObjects.add(newRowObject);
+        // SampleRowObject newRowObject = new SampleRowObject("", "", "", "", "", "", "", "");
+        this.rowObjects.add(new RowModel("", "", "", "", "", "", "", ""));
     }
 
-    void saveCsvFile() {
+    public void saveCsvFile() {
         // gather the headers
         StringBuilder output = new StringBuilder();
-        for (String header : this.headers) {
-            output.append(header);
-            output.append(",");
-        }
+        this.headers.forEach(header -> output.append(header).append(","));
         // remove the last comma on the header row, and add a line break
-        output.deleteCharAt(output.length() - 1);
-        output.append("\n");
+        output.deleteCharAt(output.length() - 1).append("\n");
+       // output.append("\n");
 
         // add a row for every object (row) in the table model
-        for (SampleRowObject row : this.rowObjects) {
-            output.append(row.orderDate + ",");
-            output.append(row.region + ",");
-            output.append(row.rep1 + ",");
-            output.append(row.rep2 + ",");
-            output.append(row.item + ",");
-            output.append(row.units + ",");
-            output.append(row.unitCost + ",");
-            output.append(row.total + "\n");
+        for (RowModel row : this.rowObjects) {
+            output.append(row.orderDate).append(",");
+            output.append(row.region).append(",");
+            output.append(row.rep1).append(",");
+            output.append(row.rep2).append(",");
+            output.append(row.item).append(",");
+            output.append(row.units).append(",");
+            output.append(row.unitCost).append(",");
+            output.append(row.total).append("\n");
         }
         // remove the last line break
         output.deleteCharAt(output.length() - 1);
@@ -153,11 +164,12 @@ public class TableData {
             writer.write(output.toString());
             writer.close();
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Save failed");
         }
     }
 
-    String getObjectFieldName(int column) {
+    public String getObjectFieldName(int column) {
         // get the name of the column
         String columnName = this.headers.get(column);
         // replace the uppercase letter at the beginning with the corresponding
@@ -165,31 +177,29 @@ public class TableData {
         return columnName.substring(0, 1).toLowerCase() + columnName.substring(1);
     }
 
-    void sortObjects(int column) {
+    public void sortObjects(int column) {
         String fieldName = this.getObjectFieldName(column);
 
         // i'm using the sort method of the class Collections to implement sorting of
         // the table model objects. i use a custom Comparator to be able to sort the
         // objects on the content of a specific field. to make this work for any
         // field/column, i use java reflection
-        Collections.sort(this.rowObjects, new Comparator<SampleRowObject>() {
-            public int compare(SampleRowObject o1, SampleRowObject o2) {
-                try {
-                    // get a field object that corresponds to the column we want to sort on
-                    Field columnField = SampleRowObject.class.getDeclaredField(fieldName);
-                    // use the field object to get the values of that field from the two objects to
-                    // compare
-                    String valueToCompareO1 = (String) columnField.get(o1);
-                    String valueToCompareO2 = (String) columnField.get(o2);
-                    // use the built in method for comparison on string objects to make a comparison
-                    return valueToCompareO1.compareToIgnoreCase(valueToCompareO2);
-                } catch (Exception e) {
-                    System.out.println(e);
-                    // if a comparison can't be made, return 0
-                    // (this means that the two objects are considered equal)
-                    // NOTE: maybe it is better to let the program crash if this happens
-                    return 0;
-                }
+        this.rowObjects.sort((o1, o2) -> {
+            try {
+                // get a field object that corresponds to the column we want to sort on
+                Field columnField = RowModel.class.getDeclaredField(fieldName);
+                // use the field object to get the values of that field from the two objects to
+                // compare
+                String valueToCompareO1 = (String) columnField.get(o1);
+                String valueToCompareO2 = (String) columnField.get(o2);
+                // use the built in method for comparison on string objects to make a comparison
+                return valueToCompareO1.compareToIgnoreCase(valueToCompareO2);
+            } catch (Exception e) {
+                e.printStackTrace();
+                // if a comparison can't be made, return 0
+                // (this means that the two objects are considered equal)
+                // NOTE: maybe it is better to let the program crash if this happens
+                return 0;
             }
         });
     }
